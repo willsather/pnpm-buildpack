@@ -1,0 +1,12 @@
+api = "0.2"
+
+[buildpack]
+  id = "willsather/pnpm-start"
+  name = "PNPM Buildpack for PNPM Start"
+  version = "0.0.1"
+
+[[buildpack.licenses]]
+type = "Apache-2.0"
+
+[[stacks]]
+id = "*"
