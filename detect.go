@@ -2,13 +2,19 @@ package pnpm_buildpack
 
 import (
 	"fmt"
-	"github.com/paketo-buildpacks/packit/v2/fs"
 	"os"
 	"path/filepath"
 
 	"github.com/paketo-buildpacks/libnodejs"
-	"github.com/paketo-buildpacks/packit"
+	"github.com/paketo-buildpacks/packit/v2"
+	"github.com/paketo-buildpacks/packit/v2/fs"
 )
+
+type BuildPlanMetadata struct {
+	Version       string `toml:"version"`
+	VersionSource string `toml:"version-source"`
+	Build         bool   `toml:"build"`
+}
 
 func Detect() packit.DetectFunc {
 	return func(context packit.DetectContext) (packit.DetectResult, error) {
@@ -45,6 +51,23 @@ func Detect() packit.DetectFunc {
 			return packit.DetectResult{}, packit.Fail.WithMessage("'package.json' has been found but does not have a 'start' command")
 		}
 
+		nodeVersion := pkg.GetVersion()
+
+		nodeRequirement := packit.BuildPlanRequirement{
+			Name: Node,
+			Metadata: BuildPlanMetadata{
+				Build: true,
+			},
+		}
+
+		if nodeVersion != "" {
+			nodeRequirement.Metadata = BuildPlanMetadata{
+				Version:       nodeVersion,
+				VersionSource: "package.json",
+				Build:         true,
+			}
+		}
+
 		fmt.Println("<<< Return Build Plan >>>")
 
 		return packit.DetectResult{
@@ -55,16 +78,11 @@ func Detect() packit.DetectFunc {
 					},
 				},
 				Requires: []packit.BuildPlanRequirement{
-					{
-						Name: Node,
-						Metadata: map[string]interface{}{
-							"launch": true,
-						},
-					},
+					nodeRequirement,
 					{
 						Name: Pnpm,
 						Metadata: map[string]interface{}{
-							"launch": true,
+							"build": true,
 						},
 					},
 				},

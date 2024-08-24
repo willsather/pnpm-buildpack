@@ -1,7 +1,7 @@
 package main
 
 import (
-	"github.com/paketo-buildpacks/packit"
+	"github.com/paketo-buildpacks/packit/v2"
 	pnpmbuildpack "github.com/willsather/pnpm-buildpack"
 )
 

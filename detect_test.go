@@ -6,7 +6,7 @@ import (
 	"testing"
 
 	. "github.com/onsi/gomega"
-	"github.com/paketo-buildpacks/packit"
+	"github.com/paketo-buildpacks/packit/v2"
 )
 
 var detect = Detect()
@@ -41,14 +41,66 @@ func Test_DetectSuccessfully(t *testing.T) {
 		Requires: []packit.BuildPlanRequirement{
 			{
 				Name: "node",
-				Metadata: map[string]interface{}{
-					"launch": true,
+				Metadata: BuildPlanMetadata{
+					Build:         true,
+					Version:       "",
+					VersionSource: "",
 				},
 			},
 			{
 				Name: "pnpm",
 				Metadata: map[string]interface{}{
-					"launch": true,
+					"build": true,
+				},
+			},
+		},
+	}))
+}
+
+func Test_DetectSuccessfullyWithNodeVersion(t *testing.T) {
+	var Expect = NewWithT(t).Expect
+	var workingDir = t.TempDir()
+
+	Expect(os.Mkdir(filepath.Join(workingDir, "custom"), os.ModePerm)).To(Succeed())
+
+	// given a `pnpm-lock.yaml` exists and a `package.json` exists with a start script
+	Expect(os.WriteFile(filepath.Join(workingDir, "custom", "pnpm-lock.yaml"), []byte{}, 0600)).To(Succeed())
+	Expect(os.WriteFile(filepath.Join(workingDir, "custom", "package.json"), []byte(`{
+				"engines" : { 
+					"npm" : ">=8.0.0 <9.0.0",
+					"node" : ">=16.0.0 <17.0.0"
+				},
+				"scripts": {
+					"start": "node server.js"
+				}
+			}`), 0600)).To(Succeed())
+
+	// when detect is called
+	result, err := detect(packit.DetectContext{
+		WorkingDir: filepath.Join(workingDir, "custom"),
+	})
+
+	// then detect returns a successful build plan and specified version
+	Expect(err).NotTo(HaveOccurred())
+	Expect(result.Plan).To(Equal(packit.BuildPlan{
+		Provides: []packit.BuildPlanProvision{
+			{
+				Name: NodeModules,
+			},
+		},
+		Requires: []packit.BuildPlanRequirement{
+			{
+				Name: "node",
+				Metadata: BuildPlanMetadata{
+					Build:         true,
+					Version:       ">=16.0.0 <17.0.0",
+					VersionSource: "package.json",
+				},
+			},
+			{
+				Name: "pnpm",
+				Metadata: map[string]interface{}{
+					"build": true,
 				},
 			},
 		},
