@@ -1,0 +1,74 @@
+package pnpm_buildpack
+
+import (
+	"fmt"
+	"github.com/paketo-buildpacks/packit/v2/fs"
+	"os"
+	"path/filepath"
+
+	"github.com/paketo-buildpacks/libnodejs"
+	"github.com/paketo-buildpacks/packit"
+)
+
+func Detect() packit.DetectFunc {
+	return func(context packit.DetectContext) (packit.DetectResult, error) {
+		fmt.Println("<<< Running Detect >>>")
+
+		// retrieve working directory
+		projectPath, err := libnodejs.FindProjectPath(context.WorkingDir)
+		if err != nil {
+			return packit.DetectResult{}, err
+		}
+
+		// check if `pnpm-lock.yaml` is present
+		exists, err := fs.Exists(filepath.Join(projectPath, "pnpm-lock.yaml"))
+		if err != nil {
+			return packit.DetectResult{}, err
+		}
+
+		if !exists {
+			fmt.Println("<<< Could Not Find `pnpm-lock.yaml` >>>")
+			return packit.DetectResult{}, packit.Fail.WithMessage("no 'pnpm-lock.yaml' file found in the project path %s", projectPath)
+		}
+
+		// check if `package.json` is present
+		pkg, err := libnodejs.ParsePackageJSON(projectPath)
+		if err != nil {
+			if os.IsNotExist(err) {
+				return packit.DetectResult{}, packit.Fail.WithMessage("no 'package.json' found in project path %s", projectPath)
+			}
+			return packit.DetectResult{}, fmt.Errorf("failed to open package.json: %w", err)
+		}
+
+		// check if `package.json` has a `start` script present
+		if !pkg.HasStartScript() {
+			return packit.DetectResult{}, packit.Fail.WithMessage("'package.json' has been found but does not have a 'start' command")
+		}
+
+		fmt.Println("<<< Return Build Plan >>>")
+
+		return packit.DetectResult{
+			Plan: packit.BuildPlan{
+				Provides: []packit.BuildPlanProvision{
+					{
+						Name: NodeModules,
+					},
+				},
+				Requires: []packit.BuildPlanRequirement{
+					{
+						Name: Node,
+						Metadata: map[string]interface{}{
+							"launch": true,
+						},
+					},
+					{
+						Name: Pnpm,
+						Metadata: map[string]interface{}{
+							"launch": true,
+						},
+					},
+				},
+			},
+		}, nil
+	}
+}

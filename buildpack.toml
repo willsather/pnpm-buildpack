@@ -1,8 +1,13 @@
-api = "0.2"
+api = "0.7"
 
 [buildpack]
-  id = "willsather/pnpm-start"
-  name = "PNPM Buildpack for PNPM Start"
+id = "willsather/pnpm-buildpack"
+name = "PNPM Buildpack"
+version = "0.0.1"
+
+[[buildpack.order]]
+  [[buildpack.order.group]]
+  id = "willsather/pnpm-buildpack"
   version = "0.0.1"
 
 [[buildpack.licenses]]
