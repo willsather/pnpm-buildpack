@@ -81,8 +81,8 @@ func Detect() packit.DetectFunc {
 					nodeRequirement,
 					{
 						Name: Pnpm,
-						Metadata: map[string]interface{}{
-							"build": true,
+						Metadata: BuildPlanMetadata{
+							Build: true,
 						},
 					},
 				},

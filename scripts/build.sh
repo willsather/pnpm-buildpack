@@ -4,52 +4,25 @@ set -eu
 set -o pipefail
 
 # Directory locations
-readonly PROGDIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-readonly BUILDPACKDIR="$(cd "${PROGDIR}/.." && pwd)"
-
-# import utils
-source "${PROGDIR}/utils/print.sh"
+readonly SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+readonly BUILD_SCRIPT="${SCRIPT_DIR}/go_build.sh"
+readonly PACKAGE_SCRIPT="${SCRIPT_DIR}/package.sh"
 
 function main() {
-  util::print::title "** GO build **"
-
-  mkdir -p "${BUILDPACKDIR}/bin"
-
-  build::run
-
-  util::print::success "** GO build completed **"
-}
-
-function build::run() {
-  if [[ -f "${BUILDPACKDIR}/run/main.go" ]]; then
-    echo "- Building /run/main.go binary ..."
-    GOOS=linux CGO_ENABLED=0 go build -ldflags="-s -w" -o "${BUILDPACKDIR}/bin/run" "${BUILDPACKDIR}/run/main.go"
-    echo "- Built /run/main.go binary built"
-
-    # Create symlinks
-    for name in detect build; do
-      ln -sf "run" "${BUILDPACKDIR}/bin/${name}"
-    done
+  # Check if build.sh exists and is executable
+  if [[ -x "${BUILD_SCRIPT}" ]]; then
+    "${BUILD_SCRIPT}"
   else
-    echo
-    util::print::error "** GO Build Failed: No main.go file found in ${BUILDPACKDIR}/run **"
+    util::print::error "Error: Build script '${BUILD_SCRIPT}' does not exist or is not executable."
+    exit 1
   fi
-}
 
-function build::executable() {
-  if [[ -d "${BUILDPACKDIR}/cmd" ]]; then
-    for src in "${BUILDPACKDIR}/cmd/"*; do
-      local name
-      name="$(basename "${src}")"
-
-      if [[ -f "${src}/main.go" ]]; then
-        echo "Building ${name}..."
-        GOOS=linux CGO_ENABLED=0 go build -ldflags="-s -w" -o "${BUILDPACKDIR}/bin/${name}" "${src}/main.go"
-        echo "${name} built successfully."
-      else
-        echo "Skipping ${name}, no main.go file."
-      fi
-    done
+  # Check if package.sh exists and is executable
+  if [[ -x "${PACKAGE_SCRIPT}" ]]; then
+    "${PACKAGE_SCRIPT}"
+  else
+    util::print::error "Error: Package script '${PACKAGE_SCRIPT}' does not exist or is not executable."
+    exit 1
   fi
 }
 
