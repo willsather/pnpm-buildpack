@@ -5,7 +5,7 @@ set -o pipefail
 
 # Directory locations
 readonly SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-readonly BUILD_SCRIPT="${SCRIPT_DIR}/go_build.sh"
+readonly BUILD_SCRIPT="${SCRIPT_DIR}/build.sh"
 readonly PACKAGE_SCRIPT="${SCRIPT_DIR}/package.sh"
 
 function main() {

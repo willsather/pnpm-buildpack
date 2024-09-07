@@ -1,4 +1,4 @@
-package pnpm_buildpack
+package pnpm_install
 
 import (
 	"os"
@@ -49,8 +49,10 @@ func Test_DetectSuccessfully(t *testing.T) {
 			},
 			{
 				Name: "pnpm",
-				Metadata: map[string]interface{}{
-					"build": true,
+				Metadata: BuildPlanMetadata{
+					Build:         true,
+					Version:       "",
+					VersionSource: "",
 				},
 			},
 		},
@@ -99,8 +101,10 @@ func Test_DetectSuccessfullyWithNodeVersion(t *testing.T) {
 			},
 			{
 				Name: "pnpm",
-				Metadata: map[string]interface{}{
-					"build": true,
+				Metadata: BuildPlanMetadata{
+					Build:         true,
+					Version:       "",
+					VersionSource: "",
 				},
 			},
 		},

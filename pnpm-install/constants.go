@@ -1,4 +1,4 @@
-package pnpm_buildpack
+package pnpm_install
 
 const (
 	Node        = "node"

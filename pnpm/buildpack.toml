@@ -1,0 +1,14 @@
+# buildpack.toml
+[buildpack]
+id = "example/pnpm"
+version = "0.0.1"
+name = "PNPM Buildpack"
+
+[[stacks]]
+id = "io.buildpacks.stacks.bionic"
+
+[[provides]]
+name = "pnpm"
+
+[[requires]]
+name = "node"
