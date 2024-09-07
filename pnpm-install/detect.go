@@ -1,4 +1,4 @@
-package pnpm_install
+package pnpminstall
 
 import (
 	"fmt"
@@ -18,7 +18,7 @@ type BuildPlanMetadata struct {
 
 func Detect() packit.DetectFunc {
 	return func(context packit.DetectContext) (packit.DetectResult, error) {
-		fmt.Println("<<< Running Detect >>>")
+		fmt.Println("<<< Running PNPM Install Detect >>>")
 
 		// retrieve working directory
 		projectPath, err := libnodejs.FindProjectPath(context.WorkingDir)
@@ -68,7 +68,7 @@ func Detect() packit.DetectFunc {
 			}
 		}
 
-		fmt.Println("<<< Return Build Plan >>>")
+		fmt.Println("<<< Return Build Plan that provides  >>>")
 
 		return packit.DetectResult{
 			Plan: packit.BuildPlan{

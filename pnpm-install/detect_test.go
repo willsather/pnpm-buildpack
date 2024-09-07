@@ -1,4 +1,4 @@
-package pnpm_install
+package pnpminstall
 
 import (
 	"os"

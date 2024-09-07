@@ -1,4 +1,4 @@
-package pnpm_install
+package pnpminstall
 
 import (
 	"fmt"
@@ -10,7 +10,7 @@ import (
 
 func Build() packit.BuildFunc {
 	return func(context packit.BuildContext) (packit.BuildResult, error) {
-		fmt.Println("<<< Starting Build Process >>>")
+		fmt.Println("<<< Starting PNPM Install Build Process >>>")
 
 		// Step 1: Install dependencies
 		installCmd := exec.Command("pnpm", "install")

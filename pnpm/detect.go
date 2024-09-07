@@ -1,22 +1,21 @@
 package pnpm
 
 import (
+	"fmt"
 	"github.com/paketo-buildpacks/packit/v2"
-	"github.com/paketo-buildpacks/packit/v2/fs"
 )
 
 func Detect() packit.DetectFunc {
-	return func(ctx packit.DetectContext) (packit.DetectResult, error) {
-		// Check for the presence of the pnpm-lock.yaml file
-		if exists, err := fs.Exists("pnpm-lock.yaml"); err != nil {
-			return packit.DetectResult{}, err
-		} else if exists {
-			return packit.DetectResult{
-				Plan: packit.BuildPlan{
-					Provides: []packit.BuildPlanProvision{{Name: "pnpm"}},
+	return func(context packit.DetectContext) (packit.DetectResult, error) {
+		fmt.Println("<<< Running PNPM Detect >>>")
+
+		fmt.Println("<<< Returning Build Plan that provides PNPM >>>")
+		return packit.DetectResult{
+			Plan: packit.BuildPlan{
+				Provides: []packit.BuildPlanProvision{
+					{Name: Pnpm},
 				},
-			}, nil
-		}
-		return packit.DetectResult{}, nil
+			},
+		}, nil
 	}
 }

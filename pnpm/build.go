@@ -10,6 +10,10 @@ import (
 
 func Build() packit.BuildFunc {
 	return func(ctx packit.BuildContext) (packit.BuildResult, error) {
+		fmt.Println("<<< Running PNPM Build >>>")
+
+		fmt.Println("<<< Installing PNPM Globally >>>")
+
 		// Install pnpm globally using npm
 		cmd := exec.Command("npm", "install", "-g", "pnpm")
 		cmd.Stdout = os.Stdout
@@ -19,17 +23,21 @@ func Build() packit.BuildFunc {
 			return packit.BuildResult{}, fmt.Errorf("failed to install pnpm: %w", err)
 		}
 
-		// provide pnpm as a layer
-		layer, err := ctx.Layers.Get("pnpm")
+		fmt.Println("<<< Providing PNPM Layer >>>")
+
+		// provide pnpm as a pnpmLayer
+		pnpmLayer, err := ctx.Layers.Get(Pnpm)
 		if err != nil {
 			return packit.BuildResult{}, err
 		}
 
 		// make sure pnpm is available in the PATH
-		layer.SharedEnv.Prepend("PATH", layer.Path, ":")
+		pnpmLayer.SharedEnv.Prepend("PATH", pnpmLayer.Path, ":")
+
+		fmt.Println("<<< Returning PNPM Build Result >>>")
 
 		return packit.BuildResult{
-			Layers: []packit.Layer{layer},
+			Layers: []packit.Layer{pnpmLayer},
 		}, nil
 	}
 }

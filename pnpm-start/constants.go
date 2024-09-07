@@ -1,4 +1,4 @@
-package pnpminstall
+package pnpmstart
 
 const (
 	Node        = "node"

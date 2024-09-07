@@ -1,4 +1,4 @@
-module pnpm
+module github.com/willsather/pnpm-buildpack/pnpm
 
 go 1.23.0
 

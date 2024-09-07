@@ -7,8 +7,8 @@ set -e
 REPO_DIR=$(dirname $(dirname "$0"))
 BUILD_DIR="$REPO_DIR/build"
 BIN_DIR="$REPO_DIR/bin"
-TARBALL_NAME="pnpm-buildpack.tar.gz"
-CNB_NAME="pnpm-buildpack.cnb"
+TARBALL_NAME="pnpm-start-buildpack.tar.gz"
+CNB_NAME="pnpm-start-buildpack.cnb"
 
 # Create the build directory if it doesn't exist
 mkdir -p "$BUILD_DIR"

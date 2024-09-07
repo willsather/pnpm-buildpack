@@ -1,14 +1,9 @@
 api = "0.7"
 
 [buildpack]
-id = "willsather/pnpm-buildpack"
-name = "PNPM Buildpack"
+id = "willsather/pnpm-buildpack/pnpm-install"
+name = "PNPM Install Buildpack"
 version = "0.0.1"
-
-[[buildpack.order]]
-  [[buildpack.order.group]]
-  id = "willsather/pnpm-buildpack"
-  version = "0.0.1"
 
 [[buildpack.licenses]]
 type = "Apache-2.0"

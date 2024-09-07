@@ -1,7 +1,7 @@
 api = "0.7"
 
 [buildpack]
-id = "willsather/pnpm-buildpack/pnpm"
+id = "willsather/pnpm-buildpack/pnpm-start"
 name = "PNPM Buildpack"
 version = "0.0.1"
 

@@ -10,9 +10,9 @@ readonly BUILD_DIR="${BUILDPACK_DIR}/build"
 source "${SCRIPT_DIR}/utils/print.sh"
 
 # define variables
-PACKAGE_NAME="buildpack.tar.gz"
+PACKAGE_NAME="pnpm-install-buildpack.tar.gz"
 BUILDPACK_TOML="buildpack.toml"
-CNB_PACKAGE_NAME="buildpack.cnb"
+CNB_PACKAGE_NAME="pnpm-install-buildpack.cnb"
 
 function main() {
     util::print::title "** Buildpack packaging **"
