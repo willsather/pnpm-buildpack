@@ -6,6 +6,21 @@ that use `pnpm` as a package manager.
 > [!WARNING]  
 > This repository is in active development, there is no expectation this code is functioning or usable (yet). :)
 
+## Modules
+
+This repository contains three different Cloud Native Buildpacks:
+
+1. `pnpm`
+2. `pnpm-install`
+3. `pnpm-start`
+
+Which are can be built separately, but can be combined to fully build a Node application that utilizes the `pnpm`
+package manager.
+
+Roughly, `pnpm` provides the `pnpm` dependency as a global dependency on the image.  `pnpm-install` provides
+`node_modules` and downloads the necessary dependencies on the image. And lastly, `pnpm-start` takes the image that has
+`pnpm` and `node_modules` and runs the `start` command for the Node application. 
+
 ## Local Setup
 
 TODO: create scripts and steps for building / packaging / publishing buildpack

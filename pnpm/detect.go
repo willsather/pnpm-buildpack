@@ -13,7 +13,9 @@ func Detect(logger scribe.Emitter) packit.DetectFunc {
 		return packit.DetectResult{
 			Plan: packit.BuildPlan{
 				Provides: []packit.BuildPlanProvision{
-					{Name: Pnpm},
+					{
+						Name: Pnpm,
+					},
 				},
 			},
 		}, nil

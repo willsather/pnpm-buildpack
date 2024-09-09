@@ -4,6 +4,7 @@ import (
 	"os"
 
 	"github.com/paketo-buildpacks/packit/v2"
+	"github.com/paketo-buildpacks/packit/v2/chronos"
 	"github.com/paketo-buildpacks/packit/v2/scribe"
 	"github.com/willsather/pnpm-buildpack/pnpm"
 )
@@ -13,6 +14,6 @@ func main() {
 
 	packit.Run(
 		pnpm.Detect(logger),
-		pnpm.Build(logger),
+		pnpm.Build(logger, chronos.DefaultClock),
 	)
 }

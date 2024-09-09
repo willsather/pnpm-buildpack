@@ -82,7 +82,9 @@ func Detect(logger scribe.Emitter) packit.DetectFunc {
 					{
 						Name: Pnpm,
 						Metadata: BuildPlanMetadata{
-							Build: true,
+							Build:         true,
+							Version:       "8.15.4",       // FIXME: get pnpm version from package.json
+							VersionSource: "package.json", // TODO: create constant for this
 						},
 					},
 				},
