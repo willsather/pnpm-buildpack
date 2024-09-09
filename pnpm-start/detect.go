@@ -8,11 +8,12 @@ import (
 	"github.com/paketo-buildpacks/libnodejs"
 	"github.com/paketo-buildpacks/packit/v2"
 	"github.com/paketo-buildpacks/packit/v2/fs"
+	"github.com/paketo-buildpacks/packit/v2/scribe"
 )
 
-func Detect() packit.DetectFunc {
+func Detect(logger scribe.Emitter) packit.DetectFunc {
 	return func(context packit.DetectContext) (packit.DetectResult, error) {
-		fmt.Println("<<< Running PNPM Start Detect >>>")
+		logger.Title("<<< Running PNPM Start Detect")
 
 		// find working directory
 		projectPath, err := libnodejs.FindProjectPath(context.WorkingDir)
@@ -43,6 +44,8 @@ func Detect() packit.DetectFunc {
 		if !pkg.HasStartScript() {
 			return packit.DetectResult{}, packit.Fail.WithMessage("'package.json' does not have a 'start' script")
 		}
+
+		logger.Detail("* PNPM Start Returning Build Plan with ONLY requirements")
 
 		return packit.DetectResult{
 			Plan: packit.BuildPlan{

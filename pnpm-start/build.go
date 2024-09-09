@@ -5,18 +5,19 @@ import (
 
 	"github.com/paketo-buildpacks/libnodejs"
 	"github.com/paketo-buildpacks/packit/v2"
+	"github.com/paketo-buildpacks/packit/v2/scribe"
 )
 
-func Build() packit.BuildFunc {
+func Build(logger scribe.Emitter) packit.BuildFunc {
 	return func(context packit.BuildContext) (packit.BuildResult, error) {
-		fmt.Println("<<< Running PNPM Start Build >>>")
+		logger.Title("<<< Running PNPM Start Build")
 
 		projectPath, err := libnodejs.FindProjectPath(context.WorkingDir)
 		if err != nil {
 			return packit.BuildResult{}, err
 		}
 
-		fmt.Println("<<< Parsing Package Json >>>")
+		logger.Action("<> Parsing Package Json")
 
 		pkg, err := libnodejs.ParsePackageJSON(projectPath)
 		if err != nil {
@@ -53,22 +54,22 @@ func Build() packit.BuildFunc {
 			args = []string{"-c", arg}
 		}
 
-		// TODO: add more logging using the `packit` scribe (instead of `fmt`)
-		// can call `logger.LaunchProcesses(processes)` here
+		processes := []packit.Process{
+			{
+				Type:    "web",
+				Command: command,
+				Args:    args,
+				Default: true,
+				Direct:  true,
+			},
+		}
 
-		fmt.Println("<<< PNPM Start Build returning Processes >>>")
+		logger.LaunchProcesses(processes)
+		logger.Detail("* PNPM Start Build returning Processes")
 
 		return packit.BuildResult{
 			Launch: packit.LaunchMetadata{
-				Processes: []packit.Process{
-					{
-						Type:    "web",
-						Command: command,
-						Args:    args,
-						Default: true,
-						Direct:  true,
-					},
-				},
+				Processes: processes,
 			},
 		}, nil
 	}

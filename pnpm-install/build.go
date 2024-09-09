@@ -1,28 +1,29 @@
 package pnpminstall
 
 import (
-	"fmt"
+	"github.com/paketo-buildpacks/packit/v2/scribe"
 	"os"
 	"os/exec"
 
 	"github.com/paketo-buildpacks/packit/v2"
 )
 
-func Build() packit.BuildFunc {
+func Build(logger scribe.Emitter) packit.BuildFunc {
 	return func(context packit.BuildContext) (packit.BuildResult, error) {
-		fmt.Println("<<< Starting PNPM Install Build Process >>>")
+		logger.Title("<<< Running PNPM Install Build")
 
 		// Step 1: Install dependencies
+		logger.Action("<> Installing Dependencies")
+
 		installCmd := exec.Command("pnpm", "install")
 		installCmd.Stdout = os.Stdout
 		installCmd.Stderr = os.Stderr
 
-		fmt.Println("<<< Installing Dependencies >>>")
 		if err := installCmd.Run(); err != nil {
 			return packit.BuildResult{}, err
 		}
 
-		fmt.Println("<<< Installed Dependencies >>>")
+		logger.Detail("* Installed Dependencies")
 
 		// Return the build result with the cached layer
 		return packit.BuildResult{}, nil

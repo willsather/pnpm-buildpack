@@ -6,13 +6,14 @@ import (
 	"os/exec"
 
 	"github.com/paketo-buildpacks/packit/v2"
+	"github.com/paketo-buildpacks/packit/v2/scribe"
 )
 
-func Build() packit.BuildFunc {
+func Build(logger scribe.Emitter) packit.BuildFunc {
 	return func(ctx packit.BuildContext) (packit.BuildResult, error) {
-		fmt.Println("<<< Running PNPM Build >>>")
+		logger.Title("<<< Running PNPM Build")
 
-		fmt.Println("<<< Installing PNPM Globally >>>")
+		logger.Action("<> Installing PNPM Globally")
 
 		// Install pnpm globally using npm
 		cmd := exec.Command("npm", "install", "-g", "pnpm")
@@ -23,18 +24,18 @@ func Build() packit.BuildFunc {
 			return packit.BuildResult{}, fmt.Errorf("failed to install pnpm: %w", err)
 		}
 
-		fmt.Println("<<< Providing PNPM Layer >>>")
+		logger.Detail("* Providing PNPM Layer")
 
 		// provide pnpm as a pnpmLayer
 		pnpmLayer, err := ctx.Layers.Get(Pnpm)
 		if err != nil {
-			return packit.BuildResult{}, err
+			return packit.BuildResult{}, fmt.Errorf("failed to retrieve pnpm layer: %w", err)
 		}
 
 		// make sure pnpm is available in the PATH
 		pnpmLayer.SharedEnv.Prepend("PATH", pnpmLayer.Path, ":")
 
-		fmt.Println("<<< Returning PNPM Build Result >>>")
+		logger.Detail("* Returning PNPM Build Result")
 
 		return packit.BuildResult{
 			Layers: []packit.Layer{pnpmLayer},

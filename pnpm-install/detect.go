@@ -8,6 +8,7 @@ import (
 	"github.com/paketo-buildpacks/libnodejs"
 	"github.com/paketo-buildpacks/packit/v2"
 	"github.com/paketo-buildpacks/packit/v2/fs"
+	"github.com/paketo-buildpacks/packit/v2/scribe"
 )
 
 type BuildPlanMetadata struct {
@@ -16,9 +17,9 @@ type BuildPlanMetadata struct {
 	Build         bool   `toml:"build"`
 }
 
-func Detect() packit.DetectFunc {
+func Detect(logger scribe.Emitter) packit.DetectFunc {
 	return func(context packit.DetectContext) (packit.DetectResult, error) {
-		fmt.Println("<<< Running PNPM Install Detect >>>")
+		logger.Title("<<< Running PNPM Install Detect")
 
 		// retrieve working directory
 		projectPath, err := libnodejs.FindProjectPath(context.WorkingDir)
@@ -33,7 +34,6 @@ func Detect() packit.DetectFunc {
 		}
 
 		if !exists {
-			fmt.Println("<<< Could Not Find `pnpm-lock.yaml` >>>")
 			return packit.DetectResult{}, packit.Fail.WithMessage("no 'pnpm-lock.yaml' file found in the project path %s", projectPath)
 		}
 
@@ -68,7 +68,7 @@ func Detect() packit.DetectFunc {
 			}
 		}
 
-		fmt.Println("<<< Return Build Plan that provides  >>>")
+		logger.Detail("* Return Build Plan that provides 'node_modules'")
 
 		return packit.DetectResult{
 			Plan: packit.BuildPlan{

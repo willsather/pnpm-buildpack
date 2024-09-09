@@ -1,20 +1,39 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
-# Exit immediately if a command exits with a non-zero status
-set -e
+set -eu
+set -o pipefail
 
-# Define variables for directories
-REPO_DIR=$(dirname $(dirname "$0"))
-BIN_DIR="$REPO_DIR/bin"
+# Directory locations
+readonly SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+readonly BUILDPACK_DIR="$(cd "${SCRIPT_DIR}/.." && pwd)"
 
-# Create the bin directory if it doesn't exist
-mkdir -p "$BIN_DIR"
+# import utils
+source "${SCRIPT_DIR}/utils/print.sh"
 
-# Build the detect and build binaries
-echo "Building detect binary..."
-GOOS=linux GOARCH=amd64 go build -o "$BIN_DIR/detect" "$REPO_DIR/run/main.go"
+function main() {
+  util::print::title "** GO build **"
 
-echo "Building build binary..."
-go build -o "$BIN_DIR/build" "$REPO_DIR/run/main.go"
+  mkdir -p "${BUILDPACK_DIR}/bin"
 
-echo "Build completed. Binaries are in the bin directory."
+  build
+
+  util::print::success "** GO build completed **"
+}
+
+function build() {
+  if [[ -f "${BUILDPACK_DIR}/run/main.go" ]]; then
+    echo "- Building /run/main.go binary ..."
+    GOOS=linux CGO_ENABLED=0 go build -ldflags="-s -w" -o "${BUILDPACK_DIR}/bin/run" "${BUILDPACK_DIR}/run/main.go"
+    echo "- Built /run/main.go binary built"
+
+    # Create symlinks
+    for name in detect build; do
+      ln -sf "run" "${BUILDPACK_DIR}/bin/${name}"
+    done
+  else
+    echo
+    util::print::error "** GO Build Failed: No main.go file found in ${BUILDPACK_DIR}/run **"
+  fi
+}
+
+main "$@"

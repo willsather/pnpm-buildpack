@@ -1,15 +1,15 @@
 package pnpm
 
 import (
-	"fmt"
 	"github.com/paketo-buildpacks/packit/v2"
+	"github.com/paketo-buildpacks/packit/v2/scribe"
 )
 
-func Detect() packit.DetectFunc {
+func Detect(logger scribe.Emitter) packit.DetectFunc {
 	return func(context packit.DetectContext) (packit.DetectResult, error) {
-		fmt.Println("<<< Running PNPM Detect >>>")
+		logger.Title("<<< Running PNPM Detect")
+		logger.Detail("* Returning Build Plan that provides PNPM")
 
-		fmt.Println("<<< Returning Build Plan that provides PNPM >>>")
 		return packit.DetectResult{
 			Plan: packit.BuildPlan{
 				Provides: []packit.BuildPlanProvision{
