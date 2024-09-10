@@ -1,6 +1,8 @@
 package pnpminstall
 
 import (
+	"bytes"
+	"github.com/paketo-buildpacks/packit/v2/scribe"
 	"os"
 	"path/filepath"
 	"testing"
@@ -9,9 +11,12 @@ import (
 	"github.com/paketo-buildpacks/packit/v2"
 )
 
-var detect = Detect()
+// setup mock logger and clock
+var mockLogger = scribe.NewEmitter(bytes.NewBuffer(nil))
 
-func Test_DetectSuccessfully(t *testing.T) {
+var detect = Detect(mockLogger)
+
+func Test_DetectSuccessfullyNoVersions(t *testing.T) {
 	var Expect = NewWithT(t).Expect
 	var workingDir = t.TempDir()
 
@@ -53,6 +58,55 @@ func Test_DetectSuccessfully(t *testing.T) {
 					Build:         true,
 					Version:       "",
 					VersionSource: "",
+				},
+			},
+		},
+	}))
+}
+
+func Test_DetectSuccessfullyPnpmVersion(t *testing.T) {
+	var Expect = NewWithT(t).Expect
+	var workingDir = t.TempDir()
+
+	Expect(os.Mkdir(filepath.Join(workingDir, "custom"), os.ModePerm)).To(Succeed())
+
+	// given a `pnpm-lock.yaml` exists and a `package.json` exists with a start script
+	Expect(os.WriteFile(filepath.Join(workingDir, "custom", "pnpm-lock.yaml"), []byte{}, 0600)).To(Succeed())
+	Expect(os.WriteFile(filepath.Join(workingDir, "custom", "package.json"), []byte(`{
+				"scripts": {
+					"start": "node server.js"
+				},
+				"packageManager": "pnpm@8.15.4"
+			}`), 0600)).To(Succeed())
+
+	// when detect is called
+	result, err := detect(packit.DetectContext{
+		WorkingDir: filepath.Join(workingDir, "custom"),
+	})
+
+	// then detect returns a successful build plan
+	Expect(err).NotTo(HaveOccurred())
+	Expect(result.Plan).To(Equal(packit.BuildPlan{
+		Provides: []packit.BuildPlanProvision{
+			{
+				Name: NodeModules,
+			},
+		},
+		Requires: []packit.BuildPlanRequirement{
+			{
+				Name: "node",
+				Metadata: BuildPlanMetadata{
+					Build:         true,
+					Version:       "",
+					VersionSource: "",
+				},
+			},
+			{
+				Name: "pnpm",
+				Metadata: BuildPlanMetadata{
+					Build:         true,
+					Version:       "8.15.4",
+					VersionSource: "package.json",
 				},
 			},
 		},

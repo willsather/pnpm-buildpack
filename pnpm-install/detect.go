@@ -1,9 +1,11 @@
 package pnpminstall
 
 import (
+	"encoding/json"
 	"fmt"
 	"os"
 	"path/filepath"
+	"strings"
 
 	"github.com/paketo-buildpacks/libnodejs"
 	"github.com/paketo-buildpacks/packit/v2"
@@ -15,6 +17,38 @@ type BuildPlanMetadata struct {
 	Version       string `toml:"version"`
 	VersionSource string `toml:"version-source"`
 	Build         bool   `toml:"build"`
+}
+
+// CustomPackageJSON represents the structure of the package.json file
+type CustomPackageJSON struct {
+	PackageManager string `json:"packageManager"`
+}
+
+// getPnpmVersion reads the package.json file from the given working directory,
+// parses the JSON, and extracts the pnpm version if present.
+func getPnpmVersion(workingDir string) (string, error) {
+	packageJSONPath := filepath.Join(workingDir, "package.json")
+
+	// Read the package.json file
+	data, err := os.ReadFile(packageJSONPath)
+	if err != nil {
+		return "", fmt.Errorf("error reading package.json: %w", err)
+	}
+
+	// Unmarshal the JSON data into a struct
+	var packageJson CustomPackageJSON
+	err = json.Unmarshal(data, &packageJson)
+	if err != nil {
+		return "", fmt.Errorf("error parsing package.json: %w", err)
+	}
+
+	// if the packageManager is pnpm and extract the version
+	if strings.HasPrefix(packageJson.PackageManager, "pnpm@") {
+		version := strings.TrimPrefix(packageJson.PackageManager, "pnpm@")
+		return version, nil
+	}
+
+	return "", fmt.Errorf("pnpm version not found in package.json")
 }
 
 func Detect(logger scribe.Emitter) packit.DetectFunc {
@@ -52,7 +86,9 @@ func Detect(logger scribe.Emitter) packit.DetectFunc {
 		}
 
 		nodeVersion := pkg.GetVersion()
+		pnpmVersion, err := getPnpmVersion(projectPath)
 
+		// build node requirement and metadata
 		nodeRequirement := packit.BuildPlanRequirement{
 			Name: Node,
 			Metadata: BuildPlanMetadata{
@@ -63,6 +99,22 @@ func Detect(logger scribe.Emitter) packit.DetectFunc {
 		if nodeVersion != "" {
 			nodeRequirement.Metadata = BuildPlanMetadata{
 				Version:       nodeVersion,
+				VersionSource: "package.json",
+				Build:         true,
+			}
+		}
+
+		// build pnpm requirement and metadata
+		pnpmRequirement := packit.BuildPlanRequirement{
+			Name: Pnpm,
+			Metadata: BuildPlanMetadata{
+				Build: true,
+			},
+		}
+
+		if pnpmVersion != "" {
+			pnpmRequirement.Metadata = BuildPlanMetadata{
+				Version:       pnpmVersion,
 				VersionSource: "package.json",
 				Build:         true,
 			}
@@ -79,14 +131,7 @@ func Detect(logger scribe.Emitter) packit.DetectFunc {
 				},
 				Requires: []packit.BuildPlanRequirement{
 					nodeRequirement,
-					{
-						Name: Pnpm,
-						Metadata: BuildPlanMetadata{
-							Build:         true,
-							Version:       "8.15.4",       // FIXME: get pnpm version from package.json
-							VersionSource: "package.json", // TODO: create constant for this
-						},
-					},
+					pnpmRequirement,
 				},
 			},
 		}, nil
