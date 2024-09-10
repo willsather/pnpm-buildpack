@@ -38,6 +38,9 @@ Current testing looks like:
 ## TODO
 
 -[ ] if, how, and where to add `pnpm build` step??
+
 -[ ] fix `build` vs `launch` dependencies
+
 -[ ] get `pnpm` version from `package.json` in `pnpm-install/detect.go`
+
 -[ ] add latest `pnpm` dependency

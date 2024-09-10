@@ -6,36 +6,39 @@ import (
 	"time"
 
 	"github.com/paketo-buildpacks/packit/v2"
-	"github.com/paketo-buildpacks/packit/v2/cargo"
 	"github.com/paketo-buildpacks/packit/v2/chronos"
 	"github.com/paketo-buildpacks/packit/v2/draft"
 	"github.com/paketo-buildpacks/packit/v2/postal"
 	"github.com/paketo-buildpacks/packit/v2/scribe"
 )
 
+//go:generate moq -out fakes/postal_service.go -pkg fakes . PostalService
+type PostalService interface {
+	Resolve(path string, id string, version string, stack string) (postal.Dependency, error)
+	Deliver(dependency postal.Dependency, cnbPath string, layerPath string, platformPath string) error
+}
+
 func Build(
+	postalService PostalService,
 	logger scribe.Emitter,
 	clock chronos.Clock,
 ) packit.BuildFunc {
 	return func(context packit.BuildContext) (packit.BuildResult, error) {
 		logger.Title("%s %s", context.BuildpackInfo.Name, context.BuildpackInfo.Version)
 
-		pnpmLayer, err := context.Layers.Get("pnpm")
+		pnpmLayer, err := context.Layers.Get(Pnpm)
 		if err != nil {
 			return packit.BuildResult{}, err
 		}
 
 		planner := draft.NewPlanner()
-		entry, _ := planner.Resolve("pnpm", context.Plan.Entries, nil)
+		entry, _ := planner.Resolve(Pnpm, context.Plan.Entries, nil)
 		version, ok := entry.Metadata["version"].(string)
 		if !ok {
 			version = "default"
 		}
 
-		transport := cargo.NewTransport()
-		service := postal.NewService(transport)
-
-		dependency, err := service.Resolve(
+		dependency, err := postalService.Resolve(
 			filepath.Join(context.CNBPath, "buildpack.toml"),
 			entry.Name,
 			version,
@@ -78,7 +81,7 @@ func Build(
 		logger.Subprocess("Installing pnpm v%s", dependency.Version)
 
 		duration, err := clock.Measure(func() error {
-			return service.Deliver(dependency, context.CNBPath, pnpmLayer.Path, context.Platform.Path)
+			return postalService.Deliver(dependency, context.CNBPath, pnpmLayer.Path, context.Platform.Path)
 		})
 		if err != nil {
 			return packit.BuildResult{}, err
