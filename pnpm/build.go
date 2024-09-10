@@ -48,13 +48,6 @@ func Build(
 
 		var buildMetadata = packit.BuildMetadata{}
 		var launchMetadata = packit.LaunchMetadata{}
-		if build {
-			buildMetadata = packit.BuildMetadata{}
-		}
-
-		if launch {
-			launchMetadata = packit.LaunchMetadata{}
-		}
 
 		// check if we can reuse a previously built layer
 		cachedSHA, ok := pnpmLayer.Metadata["checksum"].(string)
@@ -78,7 +71,9 @@ func Build(
 			return packit.BuildResult{}, err
 		}
 
-		pnpmLayer.Launch, pnpmLayer.Build, pnpmLayer.Cache = launch, build, build
+		// FIXME: does this need to be set depending on the plan?
+		//pnpmLayer.Launch, pnpmLayer.Build, pnpmLayer.Cache = launch, build, build
+		pnpmLayer.Launch, pnpmLayer.Build, pnpmLayer.Cache = true, true, true
 
 		logger.Subprocess("Installing pnpm v%s", dependency.Version)
 

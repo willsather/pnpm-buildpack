@@ -33,3 +33,11 @@ Current testing looks like:
     ```bash
     pack build sample-app -p ./pnpm-install/integration/sample-app -b gcr.io/paketo-buildpacks/node-engine -b ./pnpm/build/pnpm-buildpack.cnb -b ./pnpm-install/build/pnpm-install-buildpack.cnb -b ./pnpm-start/build/pnpm-start-buildpack.cnb
     ```
+   
+
+## TODO
+
+-[ ] if, how, and where to add `pnpm build` step??
+-[ ] fix `build` vs `launch` dependencies
+-[ ] get `pnpm` version from `package.json` in `pnpm-install/detect.go`
+-[ ] add latest `pnpm` dependency
