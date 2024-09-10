@@ -23,8 +23,6 @@ Roughly, `pnpm` provides the `pnpm` dependency as a global dependency on the ima
 
 ## Local Setup
 
-TODO: create scripts and steps for building / packaging / publishing buildpack
-
 Current testing looks like:
 
 1. build and package each module
@@ -33,14 +31,17 @@ Current testing looks like:
     ```bash
     pack build sample-app -p ./pnpm-install/integration/sample-app -b gcr.io/paketo-buildpacks/node-engine -b ./pnpm/build/pnpm-buildpack.cnb -b ./pnpm-install/build/pnpm-install-buildpack.cnb -b ./pnpm-start/build/pnpm-start-buildpack.cnb
     ```
-   
+
 
 ## TODO
-
--[ ] if, how, and where to add `pnpm build` step??
-
--[ ] fix `build` vs `launch` dependencies
-
--[ ] get `pnpm` version from `package.json` in `pnpm-install/detect.go`
-
--[ ] add latest `pnpm` dependency
+- [ ] add/update `pnpm-install` unit tests
+- [ ] add/update `pnpm-start` unit tests
+- [ ] fix `pnpm-install` integration test(s)
+- [ ] add `pnpm-start` integration test(s)
+- [ ] if, how, and where to add `pnpm build` step??
+- [ ] fix `build` vs `launch` dependencies
+- [ ] get `pnpm` version from `package.json` in `pnpm-install/detect.go`
+- [ ] add latest `pnpm` dependency
+- [ ] create primary script to bundle all three buildpacks
+- [ ] documents steps for building / packaging / publishing buildpack
+- [ ] add more integration 
