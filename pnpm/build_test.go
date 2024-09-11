@@ -85,6 +85,12 @@ func Test_BuildSuccessfully(t *testing.T) {
 		"checksum": "sha256:fake-pnpm-exe-checksum",
 	}))
 
+	// then pnpm should be added to class path
+	Expect(layer.SharedEnv).To(Equal(packit.Environment{
+		"PATH.append": filepath.Join(layersDirectory, "pnpm"),
+		"PATH.delim":  ":",
+	}))
+
 	// then postal service resolve is called (once, with parameters)
 	Expect(len(mockPostalService.ResolveCalls())).To(Equal(1))
 	Expect(mockPostalService.ResolveCalls()[0].ID).To(Equal("pnpm"))

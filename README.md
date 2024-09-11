@@ -34,8 +34,8 @@ Current testing looks like:
 
 
 ## TODO
-- [ ] add/update `pnpm-install` unit tests
-- [ ] add/update `pnpm-start` unit tests
+- [x] add/update `pnpm-install` unit tests
+- [ ] add `pnpm-start` unit tests
 - [ ] fix `pnpm-install` integration test(s)
 - [ ] add `pnpm-start` integration test(s)
 - [ ] if, how, and where to add `pnpm build` step??
@@ -44,4 +44,5 @@ Current testing looks like:
 - [ ] add latest `pnpm` dependency
 - [ ] create primary script to bundle all three buildpacks
 - [ ] documents steps for building / packaging / publishing buildpack
-- [ ] add more integration 
+- [ ] cache `pnpm install` on layer (if the sha is the same)
+- [ ] add more full integration projects (can this be automated?)

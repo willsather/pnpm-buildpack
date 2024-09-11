@@ -2,36 +2,20 @@ package pnpminstall
 
 import (
 	"os"
-	"os/exec"
 	"path/filepath"
 
 	"github.com/paketo-buildpacks/packit/v2"
 	"github.com/paketo-buildpacks/packit/v2/scribe"
 )
 
-func Build(logger scribe.Emitter) packit.BuildFunc {
+//go:generate moq -out fakes/dependency_service.go -pkg fakes . DependencyService
+type DependencyService interface {
+	Install(path string) error
+}
+
+func Build(dependencyService DependencyService, logger scribe.Emitter) packit.BuildFunc {
 	return func(context packit.BuildContext) (packit.BuildResult, error) {
 		logger.Title("<<< Running PNPM Install Build")
-
-		// FIXME: are we okay with avoiding this now?
-		// Maybe we do this on `debug` logs?
-
-		// step 0: verify npm and pnpm were installed
-		vNPM := exec.Command("npm", "-v")
-		vNPM.Stdout = os.Stdout
-		vNPM.Stderr = os.Stderr
-
-		if err := vNPM.Run(); err != nil {
-			return packit.BuildResult{}, err
-		}
-
-		vPNPM := exec.Command("pnpm", "-v")
-		vPNPM.Stdout = os.Stdout
-		vPNPM.Stderr = os.Stderr
-
-		if err := vPNPM.Run(); err != nil {
-			return packit.BuildResult{}, err
-		}
 
 		// step XX: get pnpm project path
 		//projectPath, err := libnodejs.FindProjectPath(context.WorkingDir)
@@ -49,35 +33,31 @@ func Build(logger scribe.Emitter) packit.BuildFunc {
 		// launch, build := planner.MergeLayerTypes(NodeModules, context.Plan.Entries)
 
 		//if build {
-		logger.Action("<> (Build) Installing All Dependencies")
 
-		// get layer for the dependencies required for build
+		// create layer for the dependencies required for build
 		layer, err := context.Layers.Get("build-modules")
 		if err != nil {
 			return packit.BuildResult{}, err
 		}
 
-		// maybe this needs to be reset?
+		// TODO: test if this is even needed ???
 		layer, err = layer.Reset()
 		if err != nil {
 			return packit.BuildResult{}, err
 		}
 
-		// make new node_modules folder
-		err = os.Mkdir(filepath.Join(layer.Path, "node_modules"), os.ModePerm)
+		// make new node_modules folder (TODO: test context.workingDir vs layer.Path)
+		err = os.Mkdir(filepath.Join(context.WorkingDir, "node_modules"), os.ModePerm)
 		if err != nil {
 			return packit.BuildResult{}, err
 		}
 
-		installCmd := exec.Command("pnpm", "install", "--frozen-lockfile")
-		installCmd.Stdout = os.Stdout
-		installCmd.Stderr = os.Stderr
+		logger.Action("<> (Build) Installing All Dependencies")
+		err = dependencyService.Install(filepath.Join(context.WorkingDir))
 
-		if err := installCmd.Run(); err != nil {
-			return packit.BuildResult{}, err
-		}
+		// TODO: Add `install` cache with sha on the layer (and then check `shouldInstall` before actually installing
 
-		// FIXME: are these required?
+		// FIXME: is these symlinks / folder copy required?
 		// move node_modules folder
 		//err = fs.Move(filepath.Join(projectPath, "node_modules"), filepath.Join(layer.Path, "node_modules"))
 		//if err != nil {

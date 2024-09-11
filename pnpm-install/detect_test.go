@@ -1,30 +1,29 @@
-package pnpminstall
+package pnpminstall_test
 
 import (
 	"bytes"
-	"github.com/paketo-buildpacks/packit/v2/scribe"
 	"os"
 	"path/filepath"
 	"testing"
 
 	. "github.com/onsi/gomega"
 	"github.com/paketo-buildpacks/packit/v2"
+	"github.com/paketo-buildpacks/packit/v2/scribe"
+	"github.com/willsather/pnpm-buildpack/pnpm-install"
 )
 
 // setup mock logger and clock
-var mockLogger = scribe.NewEmitter(bytes.NewBuffer(nil))
-
-var detect = Detect(mockLogger)
+var detect = pnpminstall.Detect(scribe.NewEmitter(bytes.NewBuffer(nil)))
 
 func Test_DetectSuccessfullyNoVersions(t *testing.T) {
 	var Expect = NewWithT(t).Expect
-	var workingDir = t.TempDir()
+	var workingDirectory = t.TempDir()
 
-	Expect(os.Mkdir(filepath.Join(workingDir, "custom"), os.ModePerm)).To(Succeed())
+	Expect(os.Mkdir(filepath.Join(workingDirectory, "project"), os.ModePerm)).To(Succeed())
 
 	// given a `pnpm-lock.yaml` exists and a `package.json` exists with a start script
-	Expect(os.WriteFile(filepath.Join(workingDir, "custom", "pnpm-lock.yaml"), []byte{}, 0600)).To(Succeed())
-	Expect(os.WriteFile(filepath.Join(workingDir, "custom", "package.json"), []byte(`{
+	Expect(os.WriteFile(filepath.Join(workingDirectory, "project", "pnpm-lock.yaml"), []byte{}, 0600)).To(Succeed())
+	Expect(os.WriteFile(filepath.Join(workingDirectory, "project", "package.json"), []byte(`{
 				"scripts": {
 					"start": "node server.js"
 				}
@@ -32,7 +31,7 @@ func Test_DetectSuccessfullyNoVersions(t *testing.T) {
 
 	// when detect is called
 	result, err := detect(packit.DetectContext{
-		WorkingDir: filepath.Join(workingDir, "custom"),
+		WorkingDir: filepath.Join(workingDirectory, "project"),
 	})
 
 	// then detect returns a successful build plan
@@ -40,13 +39,13 @@ func Test_DetectSuccessfullyNoVersions(t *testing.T) {
 	Expect(result.Plan).To(Equal(packit.BuildPlan{
 		Provides: []packit.BuildPlanProvision{
 			{
-				Name: NodeModules,
+				Name: "node_modules",
 			},
 		},
 		Requires: []packit.BuildPlanRequirement{
 			{
 				Name: "node",
-				Metadata: BuildPlanMetadata{
+				Metadata: pnpminstall.BuildPlanMetadata{
 					Build:         true,
 					Version:       "",
 					VersionSource: "",
@@ -54,7 +53,7 @@ func Test_DetectSuccessfullyNoVersions(t *testing.T) {
 			},
 			{
 				Name: "pnpm",
-				Metadata: BuildPlanMetadata{
+				Metadata: pnpminstall.BuildPlanMetadata{
 					Build:         true,
 					Version:       "",
 					VersionSource: "",
@@ -68,11 +67,11 @@ func Test_DetectSuccessfullyPnpmVersion(t *testing.T) {
 	var Expect = NewWithT(t).Expect
 	var workingDir = t.TempDir()
 
-	Expect(os.Mkdir(filepath.Join(workingDir, "custom"), os.ModePerm)).To(Succeed())
+	Expect(os.Mkdir(filepath.Join(workingDir, "project"), os.ModePerm)).To(Succeed())
 
 	// given a `pnpm-lock.yaml` exists and a `package.json` exists with a start script
-	Expect(os.WriteFile(filepath.Join(workingDir, "custom", "pnpm-lock.yaml"), []byte{}, 0600)).To(Succeed())
-	Expect(os.WriteFile(filepath.Join(workingDir, "custom", "package.json"), []byte(`{
+	Expect(os.WriteFile(filepath.Join(workingDir, "project", "pnpm-lock.yaml"), []byte{}, 0600)).To(Succeed())
+	Expect(os.WriteFile(filepath.Join(workingDir, "project", "package.json"), []byte(`{
 				"scripts": {
 					"start": "node server.js"
 				},
@@ -81,7 +80,7 @@ func Test_DetectSuccessfullyPnpmVersion(t *testing.T) {
 
 	// when detect is called
 	result, err := detect(packit.DetectContext{
-		WorkingDir: filepath.Join(workingDir, "custom"),
+		WorkingDir: filepath.Join(workingDir, "project"),
 	})
 
 	// then detect returns a successful build plan
@@ -89,13 +88,13 @@ func Test_DetectSuccessfullyPnpmVersion(t *testing.T) {
 	Expect(result.Plan).To(Equal(packit.BuildPlan{
 		Provides: []packit.BuildPlanProvision{
 			{
-				Name: NodeModules,
+				Name: "node_modules",
 			},
 		},
 		Requires: []packit.BuildPlanRequirement{
 			{
 				Name: "node",
-				Metadata: BuildPlanMetadata{
+				Metadata: pnpminstall.BuildPlanMetadata{
 					Build:         true,
 					Version:       "",
 					VersionSource: "",
@@ -103,7 +102,7 @@ func Test_DetectSuccessfullyPnpmVersion(t *testing.T) {
 			},
 			{
 				Name: "pnpm",
-				Metadata: BuildPlanMetadata{
+				Metadata: pnpminstall.BuildPlanMetadata{
 					Build:         true,
 					Version:       "8.15.4",
 					VersionSource: "package.json",
@@ -117,11 +116,11 @@ func Test_DetectSuccessfullyWithNodeVersion(t *testing.T) {
 	var Expect = NewWithT(t).Expect
 	var workingDir = t.TempDir()
 
-	Expect(os.Mkdir(filepath.Join(workingDir, "custom"), os.ModePerm)).To(Succeed())
+	Expect(os.Mkdir(filepath.Join(workingDir, "project"), os.ModePerm)).To(Succeed())
 
 	// given a `pnpm-lock.yaml` exists and a `package.json` exists with a start script
-	Expect(os.WriteFile(filepath.Join(workingDir, "custom", "pnpm-lock.yaml"), []byte{}, 0600)).To(Succeed())
-	Expect(os.WriteFile(filepath.Join(workingDir, "custom", "package.json"), []byte(`{
+	Expect(os.WriteFile(filepath.Join(workingDir, "project", "pnpm-lock.yaml"), []byte{}, 0600)).To(Succeed())
+	Expect(os.WriteFile(filepath.Join(workingDir, "project", "package.json"), []byte(`{
 				"engines" : { 
 					"npm" : ">=8.0.0 <9.0.0",
 					"node" : ">=16.0.0 <17.0.0"
@@ -133,7 +132,7 @@ func Test_DetectSuccessfullyWithNodeVersion(t *testing.T) {
 
 	// when detect is called
 	result, err := detect(packit.DetectContext{
-		WorkingDir: filepath.Join(workingDir, "custom"),
+		WorkingDir: filepath.Join(workingDir, "project"),
 	})
 
 	// then detect returns a successful build plan and specified version
@@ -141,13 +140,13 @@ func Test_DetectSuccessfullyWithNodeVersion(t *testing.T) {
 	Expect(result.Plan).To(Equal(packit.BuildPlan{
 		Provides: []packit.BuildPlanProvision{
 			{
-				Name: NodeModules,
+				Name: "node_modules",
 			},
 		},
 		Requires: []packit.BuildPlanRequirement{
 			{
 				Name: "node",
-				Metadata: BuildPlanMetadata{
+				Metadata: pnpminstall.BuildPlanMetadata{
 					Build:         true,
 					Version:       ">=16.0.0 <17.0.0",
 					VersionSource: "package.json",
@@ -155,7 +154,7 @@ func Test_DetectSuccessfullyWithNodeVersion(t *testing.T) {
 			},
 			{
 				Name: "pnpm",
-				Metadata: BuildPlanMetadata{
+				Metadata: pnpminstall.BuildPlanMetadata{
 					Build:         true,
 					Version:       "",
 					VersionSource: "",
@@ -169,11 +168,11 @@ func Test_DetectFailsWithoutStartScript(t *testing.T) {
 	var Expect = NewWithT(t).Expect
 	var workingDir = t.TempDir()
 
-	Expect(os.Mkdir(filepath.Join(workingDir, "custom"), os.ModePerm)).To(Succeed())
+	Expect(os.Mkdir(filepath.Join(workingDir, "project"), os.ModePerm)).To(Succeed())
 
 	// given a `pnpm-lock.yaml` exists and a package.json exists WITHOUT a start script
-	Expect(os.WriteFile(filepath.Join(workingDir, "custom", "pnpm-lock.yaml"), []byte{}, 0600)).To(Succeed())
-	Expect(os.WriteFile(filepath.Join(workingDir, "custom", "package.json"), []byte(`{
+	Expect(os.WriteFile(filepath.Join(workingDir, "project", "pnpm-lock.yaml"), []byte{}, 0600)).To(Succeed())
+	Expect(os.WriteFile(filepath.Join(workingDir, "project", "package.json"), []byte(`{
 				"scripts": {
 					"lint":  "npm run lint"
 				}
@@ -181,7 +180,7 @@ func Test_DetectFailsWithoutStartScript(t *testing.T) {
 
 	// when detect is called
 	_, err := detect(packit.DetectContext{
-		WorkingDir: filepath.Join(workingDir, "custom"),
+		WorkingDir: filepath.Join(workingDir, "project"),
 	})
 
 	// then detect fails with appropriate message
@@ -195,28 +194,28 @@ func Test_DetectFailsNoPackageJson(t *testing.T) {
 	var Expect = NewWithT(t).Expect
 	var workingDir = t.TempDir()
 
-	Expect(os.Mkdir(filepath.Join(workingDir, "custom"), os.ModePerm)).To(Succeed())
+	Expect(os.Mkdir(filepath.Join(workingDir, "project"), os.ModePerm)).To(Succeed())
 
 	// given a `pnpm-lock/yaml` but no package json
-	Expect(os.WriteFile(filepath.Join(workingDir, "custom", "pnpm-lock.yaml"), []byte{}, 0600)).To(Succeed())
+	Expect(os.WriteFile(filepath.Join(workingDir, "project", "pnpm-lock.yaml"), []byte{}, 0600)).To(Succeed())
 
 	// when detect is called
 	_, err := detect(packit.DetectContext{
-		WorkingDir: filepath.Join(workingDir, "custom"),
+		WorkingDir: filepath.Join(workingDir, "project"),
 	})
 
 	// then detect fails with missing package.json message
-	Expect(err).To(MatchError(packit.Fail.WithMessage("no 'package.json' found in project path %s", filepath.Join(workingDir, "custom"))))
+	Expect(err).To(MatchError(packit.Fail.WithMessage("no 'package.json' found in project path %s", filepath.Join(workingDir, "project"))))
 }
 
 func Test_DetectFailsNoPnpmLock(t *testing.T) {
 	var Expect = NewWithT(t).Expect
 	var workingDir = t.TempDir()
 
-	Expect(os.Mkdir(filepath.Join(workingDir, "custom"), os.ModePerm)).To(Succeed())
+	Expect(os.Mkdir(filepath.Join(workingDir, "project"), os.ModePerm)).To(Succeed())
 
 	// given no pnpm-lock.yaml
-	Expect(os.WriteFile(filepath.Join(workingDir, "custom", "package.json"), []byte(`{
+	Expect(os.WriteFile(filepath.Join(workingDir, "project", "package.json"), []byte(`{
 				"scripts": {
 					"start": "node server.js"
 				}
@@ -224,11 +223,11 @@ func Test_DetectFailsNoPnpmLock(t *testing.T) {
 
 	// when detect is called
 	_, err := detect(packit.DetectContext{
-		WorkingDir: filepath.Join(workingDir, "custom"),
+		WorkingDir: filepath.Join(workingDir, "project"),
 	})
 
 	// then detect fails with missing pnpm-lock.yaml message
-	Expect(err).To(MatchError(packit.Fail.WithMessage("no 'pnpm-lock.yaml' file found in the project path %s", filepath.Join(workingDir, "custom"))))
+	Expect(err).To(MatchError(packit.Fail.WithMessage("no 'pnpm-lock.yaml' file found in the project path %s", filepath.Join(workingDir, "project"))))
 }
 
 func Test_DetectFailsWithoutPackageJsonAccess(t *testing.T) {
@@ -236,18 +235,18 @@ func Test_DetectFailsWithoutPackageJsonAccess(t *testing.T) {
 
 	// create fake working directory
 	var workingDir = t.TempDir()
-	Expect(os.Mkdir(filepath.Join(workingDir, "custom"), os.ModePerm)).To(Succeed())
+	Expect(os.Mkdir(filepath.Join(workingDir, "project"), os.ModePerm)).To(Succeed())
 
 	// given `pnpm-lock.yaml` is created and `package.json` is created but doesn't have correct permissions
-	Expect(os.WriteFile(filepath.Join(workingDir, "custom", "pnpm-lock.yaml"), []byte{}, 0600)).To(Succeed())
+	Expect(os.WriteFile(filepath.Join(workingDir, "project", "pnpm-lock.yaml"), []byte{}, 0600)).To(Succeed())
 
-	var packageJsonPath = filepath.Join(workingDir, "custom", "package.json")
+	var packageJsonPath = filepath.Join(workingDir, "project", "package.json")
 	Expect(os.WriteFile(packageJsonPath, []byte{}, 0600)).To(Succeed())
 	Expect(os.Chmod(packageJsonPath, 0000)).To(Succeed())
 
 	// when detect is called
 	_, err := detect(packit.DetectContext{
-		WorkingDir: filepath.Join(workingDir, "custom"),
+		WorkingDir: filepath.Join(workingDir, "project"),
 	})
 
 	// then detect fails with permission denied message
