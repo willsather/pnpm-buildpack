@@ -1,0 +1,20 @@
+{
+  "name": "@integration/simple-app",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js",
+    "build": "echo 'Build script executed'"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "express": "^4.19.2"
+  },
+  "packageManager": "pnpm@8.15.4",
+  "engines": {
+    "node": ">=20"
+  }
+}

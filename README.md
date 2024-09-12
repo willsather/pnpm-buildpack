@@ -29,7 +29,7 @@ Current testing looks like:
 
 2. pack sample application:
     ```bash
-    pack build sample-app -p ./pnpm-install/integration/sample-app -b gcr.io/paketo-buildpacks/node-engine -b ./pnpm/build/pnpm-buildpack.cnb -b ./pnpm-install/build/pnpm-install-buildpack.cnb -b ./pnpm-start/build/pnpm-start-buildpack.cnb
+    pack build simple-app -p ./integration/simple-app -b gcr.io/paketo-buildpacks/node-engine -b ./pnpm/build/pnpm-buildpack.cnb -b ./pnpm-install/build/pnpm-install-buildpack.cnb -b ./pnpm-start/build/pnpm-start-buildpack.cnb
     ```
 
 
