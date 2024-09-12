@@ -1,61 +1,98 @@
 package integration
 
 import (
-	"os/exec"
+	"fmt"
+	"os"
 	"path/filepath"
+	"strings"
 	"testing"
 
+	"github.com/BurntSushi/toml"
 	. "github.com/onsi/gomega"
-	"github.com/sclevine/spec"
-	"github.com/sclevine/spec/report"
+	"github.com/paketo-buildpacks/occam"
 )
 
-func Test_SampleAppIntegration(t *testing.T) {
+func Test_SimpleSampleApplicationPnpmInstall(t *testing.T) {
 	if testing.Short() {
 		t.Skip("Skipping integration test")
 	}
 
-	Expect := NewWithT(t).Expect
+	var (
+		Expect     = NewWithT(t).Expect
+		Eventually = NewWithT(t).Eventually
 
-	spec.Run(t, "Integration", func(t *testing.T, when spec.G, it spec.S) {
-		var (
-			buildpackPath string
-			appPath       string
-			output        []byte
-			err           error
-		)
+		image     occam.Image
+		container occam.Container
 
-		it.Before(func() {
-			// Set up paths for the buildpack and sample app
-			buildpackPath, err = filepath.Abs("../../bin/buildpack")
-			Expect(err).NotTo(HaveOccurred())
+		buildpackInfo struct {
+			Buildpack struct {
+				ID   string
+				Name string
+			}
+		}
 
-			appPath, err = filepath.Abs("./sample-app")
-			Expect(err).NotTo(HaveOccurred())
-		})
+		err error
+	)
 
-		it("builds the app using the custom pnpm buildpack", func() {
-			// Run the pack build command
-			cmd := exec.Command("pack", "build", "sample-app", "--buildpack", buildpackPath, "--path", appPath)
-			output, err = cmd.CombinedOutput()
+	// before
+	pack := occam.NewPack()
+	docker := occam.NewDocker()
 
-			Expect(err).NotTo(HaveOccurred(), string(output))
-			Expect(string(output)).To(ContainSubstring("Successfully built image"))
-		})
+	name, err := occam.RandomName()
+	Expect(err).NotTo(HaveOccurred())
 
-		it("runs the app", func() {
-			// Run the built image
-			cmd := exec.Command("docker", "run", "-d", "-p", "3000:3000", "sample-app")
-			containerID, err := cmd.Output()
+	// setup other buildpacks
+	file, err := os.Open("../buildpack.toml")
+	Expect(err).NotTo(HaveOccurred())
 
-			Expect(err).NotTo(HaveOccurred())
+	_, err = toml.NewDecoder(file).Decode(&buildpackInfo)
+	Expect(err).NotTo(HaveOccurred())
 
-			// Verify the app is running
-			defer exec.Command("docker", "rm", "-f", string(containerID)).Run()
+	// go get all necessary buildpacks
+	buildpackStore := occam.NewBuildpackStore()
 
-			resp, err := exec.Command("curl", "http://localhost:3000").Output()
-			Expect(err).NotTo(HaveOccurred())
-			Expect(string(resp)).To(ContainSubstring("Hello, world!"))
-		})
-	}, spec.Report(report.Terminal{}))
+	nodeURI, err := buildpackStore.Get.Execute("github.com/paketo-buildpacks/node-engine")
+	Expect(err).ToNot(HaveOccurred())
+
+	pnpmURI, err := buildpackStore.Get.WithVersion("0.0.1").Execute("../../pnpm")
+
+	Expect(err).ToNot(HaveOccurred())
+
+	// source the sample project
+	source, err := occam.Source(filepath.Join("collateral", "sample-app"))
+	Expect(err).NotTo(HaveOccurred())
+
+	// when build is called
+	image, _, err = pack.Build.
+		WithBuildpacks(
+			nodeURI,
+			pnpmURI,
+			// TODO: are these needed for pnpm?
+			//buildpackURI,
+			//buildPlanURI,
+		).
+		WithPullPolicy("always").
+		Execute(name, source)
+
+	Expect(err).NotTo(HaveOccurred())
+
+	// check the contents of the node modules
+	container, err = docker.Container.Run.
+		WithCommand(fmt.Sprintf("ls -alR /layers/%s/launch-modules/node_modules",
+			strings.ReplaceAll(buildpackInfo.Buildpack.ID, "/", "_"))).
+		Execute(image.ID)
+
+	Expect(err).NotTo(HaveOccurred())
+
+	Eventually(func() string {
+		cLogs, err := docker.Container.Logs.Execute(container.ID)
+		Expect(err).NotTo(HaveOccurred())
+		return cLogs.String()
+	}).Should(ContainSubstring("leftpad"))
+
+	// cleanup
+	Expect(docker.Container.Remove.Execute(container.ID)).To(Succeed())
+	Expect(docker.Image.Remove.Execute(image.ID)).To(Succeed())
+	Expect(docker.Volume.Remove.Execute(occam.CacheVolumeNames(name))).To(Succeed())
+	Expect(os.RemoveAll(source)).To(Succeed())
 }

@@ -45,4 +45,5 @@ Current testing looks like:
 - [ ] create primary script to bundle all three buildpacks
 - [ ] documents steps for building / packaging / publishing buildpack
 - [ ] cache `pnpm install` on layer (if the sha is the same)
+- [ ] better utilize `jam` CLI tool to build/package each buildpack
 - [ ] add more full integration projects (can this be automated?)
