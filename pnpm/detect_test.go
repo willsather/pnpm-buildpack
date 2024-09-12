@@ -12,7 +12,7 @@ import (
 
 func Test_DetectSuccessfully(t *testing.T) {
 	var Expect = NewWithT(t).Expect
-	var workingDir = t.TempDir()
+	var workingDirectory = t.TempDir()
 
 	// setup mock logger
 	var mockLogger = scribe.NewEmitter(bytes.NewBuffer(nil))
@@ -20,7 +20,7 @@ func Test_DetectSuccessfully(t *testing.T) {
 
 	// when detect is called
 	result, err := detect(packit.DetectContext{
-		WorkingDir: workingDir,
+		WorkingDir: workingDirectory,
 	})
 
 	// then detect returns a successful build plan

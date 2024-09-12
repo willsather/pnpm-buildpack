@@ -26,8 +26,8 @@ type CustomPackageJSON struct {
 
 // getPnpmVersion reads the package.json file from the given working directory,
 // parses the JSON, and extracts the pnpm version if present.
-func getPnpmVersion(workingDir string) (string, error) {
-	packageJSONPath := filepath.Join(workingDir, "package.json")
+func getPnpmVersion(workingDirectory string) (string, error) {
+	packageJSONPath := filepath.Join(workingDirectory, "package.json")
 
 	// Read the package.json file
 	data, err := os.ReadFile(packageJSONPath)
