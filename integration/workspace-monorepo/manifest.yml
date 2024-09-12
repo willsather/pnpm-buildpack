@@ -1,6 +1,6 @@
 ---
 applications:
-  - name: pnpm-sample-app
+  - name: pnpm-workspace
     buildpacks:
       - pnpm-buildpack
       - pnpm-install-buildpack

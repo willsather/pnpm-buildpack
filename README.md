@@ -34,13 +34,28 @@ Current testing looks like:
 
 
 ## TODO
-- [ ] fix `pnpm-install` integration test(s)
-- [ ] add `pnpm-start` integration test(s)
+
+### Cleanup
 - [ ] if, how, and where to add `pnpm build` step??
+- [ ] fix what happens in `pnpm-install` if `node_modules` already exists (_what happens if it exists but is invalid?_)
 - [ ] fix `build` vs `launch` dependencies
 - [ ] add latest `pnpm` dependency
+
+### Testing
+- [ ] fix `pnpm-install` integration test(s)
+- [ ] add `pnpm-start` integration test(s)
+- [ ] add more full integration projects
+
+### Features
+- [ ] cache `pnpm install` on layer (if the sha is the same)
+
+### Building / Publishing
 - [ ] create primary script to bundle all three buildpacks
 - [ ] documents steps for building / packaging / publishing buildpack
-- [ ] cache `pnpm install` on layer (if the sha is the same)
 - [ ] better utilize `jam` CLI tool to build/package each buildpack
-- [ ] add more full integration projects (can this be automated?)
+
+
+## Questions
+- [ ] how are workspaces handled in existing buildpacks (npm/yarn)
+- [ ] how do buildpacks get published? which registry? (how does `cf create-buildpack` work in this context)
+- [ ] how do multiple buildpacks get combined into just a single one like (`nodejs_buildpack`)
