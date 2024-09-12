@@ -1,36 +1,14 @@
 package pnpmstart
 
 import (
-	"os"
-	"os/exec"
-
 	"github.com/paketo-buildpacks/packit/v2"
 	"github.com/paketo-buildpacks/packit/v2/scribe"
+	"os"
 )
 
 func Build(logger scribe.Emitter) packit.BuildFunc {
 	return func(context packit.BuildContext) (packit.BuildResult, error) {
 		logger.Title("<<< Running PNPM Start Build")
-
-		// FIXME: are we okay with avoiding this now?
-		// Maybe we do this on `debug` logs?
-
-		// step 0: verify npm and pnpm were installed
-		vNPM := exec.Command("npm", "-v")
-		vNPM.Stdout = os.Stdout
-		vNPM.Stderr = os.Stderr
-
-		if err := vNPM.Run(); err != nil {
-			return packit.BuildResult{}, err
-		}
-
-		vPNPM := exec.Command("pnpm", "-v")
-		vPNPM.Stdout = os.Stdout
-		vPNPM.Stderr = os.Stderr
-
-		if err := vPNPM.Run(); err != nil {
-			return packit.BuildResult{}, err
-		}
 
 		// FIXME: support `prestart` and `poststart` commands like npm and yarn do
 		//projectPath, err := libnodejs.FindProjectPath(context.WorkingDir)
@@ -38,7 +16,7 @@ func Build(logger scribe.Emitter) packit.BuildFunc {
 		//	return packit.BuildResult{}, err
 		//}
 
-		logger.Action("<> Parsing Package Json")
+		//logger.Action("<> Parsing Package Json")
 
 		//pkg, err := libnodejs.ParsePackageJSON(projectPath)
 		//if err != nil {
