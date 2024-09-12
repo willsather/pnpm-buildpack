@@ -1,0 +1,57 @@
+name: ci
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  pnpm:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: build
+        working-directory: ./pnpm
+        run: |
+          go build ./...
+
+      - name: test
+        working-directory: ./pnpm
+        run: |
+          go test ./...  
+
+  pnpm-install:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: build
+        working-directory: ./pnpm-install
+        run: |
+          go build ./...
+
+      - name: test
+        working-directory: ./pnpm-install
+        run: |
+          go test ./...
+  pnpm-start:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: build
+        working-directory: ./pnpm-start
+        run: |
+          go build ./...
+
+      - name: test
+        working-directory: ./pnpm-start
+        run: |
+          go test ./...
