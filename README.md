@@ -34,13 +34,10 @@ Current testing looks like:
 
 
 ## TODO
-- [x] add/update `pnpm-install` unit tests
-- [ ] add `pnpm-start` unit tests
 - [ ] fix `pnpm-install` integration test(s)
 - [ ] add `pnpm-start` integration test(s)
 - [ ] if, how, and where to add `pnpm build` step??
 - [ ] fix `build` vs `launch` dependencies
-- [x] get `pnpm` version from `package.json` in `pnpm-install/detect.go`
 - [ ] add latest `pnpm` dependency
 - [ ] create primary script to bundle all three buildpacks
 - [ ] documents steps for building / packaging / publishing buildpack
