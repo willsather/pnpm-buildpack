@@ -23,6 +23,10 @@ buildpack.tar.gz
 # Dependency directories (remove the comment below to include it)
 # vendor/
 
+# Build
+bin
+build
+
 # Go workspace file
 go.work
 go.work.sum

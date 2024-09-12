@@ -1,0 +1,32 @@
+api = "0.7"
+
+[buildpack]
+    homepage = "https://github.com/willsather/pnpm-buildpack"
+    id = "willsather/pnpm-buildpack"
+    name = "PNPM Buildpack"
+    version = "0.0.1"
+
+    [[buildpack.licenses]]
+    type = "MIT"
+    uri = "https://github.com/willsather/pnpm-buildpack/blob/main/LICENSE"
+
+[metadata]
+    include-files = ["buildpack.toml"]
+
+[[order]]
+
+    [[order.group]]
+    id = "paketo-buildpacks/node-engine"
+    version = "4.1.11"
+
+    [[order.group]]
+    id = "willsather/pnpm"
+    version = "0.0.1"
+
+    [[order.group]]
+    id = "willsather/pnpm-install"
+    version = "0.0.1"
+
+    [[order.group]]
+    id = "willsather/pnpm-start"
+    version = "0.0.1"

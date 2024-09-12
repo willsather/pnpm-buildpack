@@ -1,24 +1,28 @@
 #!/bin/bash
 
-# Exit immediately if a command exits with a non-zero status
-set -e
+# directory locations
+readonly SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
-# Define variables for directories
-REPO_DIR=$(dirname $(dirname "$0"))
-BUILD_DIR="$REPO_DIR/build"
-BIN_DIR="$REPO_DIR/bin"
-TARBALL_NAME="pnpm-buildpack.tar.gz"
-CNB_NAME="pnpm-buildpack.cnb"
+# import utils
+source "${SCRIPT_DIR}/utils/print.sh"
 
-# Create the build directory if it doesn't exist
-mkdir -p "$BUILD_DIR"
+BUILD_OUTPUT_DIR="./build"
+PACKAGE_CONFIG="./package.toml"
 
-# Package the buildpack files into a tarball
-echo "Packaging buildpack into tarball..."
-tar -czf "$BUILD_DIR/$TARBALL_NAME" -C "$REPO_DIR" bin buildpack.toml
+function main() {
+  util::print::title "** Buildpack packaging **"
 
-# Create the .cnb file by copying the tarball
-echo "Creating .cnb file from the tarball..."
-cp "$BUILD_DIR/$TARBALL_NAME" "$BUILD_DIR/$CNB_NAME"
+  mkdir -p "$BUILD_OUTPUT_DIR"
 
-echo "Packaging completed. Artifacts (tarball and .cnb file) are in the build directory."
+  util::print::info "... Packaging buildpack into $BUILD_OUTPUT_DIR/pnpm.cnb ..."
+  pack buildpack package "$BUILD_OUTPUT_DIR/pnpm.cnb" --config "$PACKAGE_CONFIG" --format file
+
+  if [ $? -eq 0 ]; then
+    util::print::success "** Buildpack packaging completed **"
+  else
+    util::print::failure "** Buildpack packaging failed **"
+    exit 1
+  fi
+}
+
+main "$@"

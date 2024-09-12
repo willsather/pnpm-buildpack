@@ -19,43 +19,51 @@ package manager.
 
 Roughly, `pnpm` provides the `pnpm` dependency as a global dependency on the image.  `pnpm-install` provides
 `node_modules` and downloads the necessary dependencies on the image. And lastly, `pnpm-start` takes the image that has
-`pnpm` and `node_modules` and runs the `start` command for the Node application. 
+`pnpm` and `node_modules` and runs the `start` command for the Node application.
 
 ## Local Setup
 
 Current testing looks like:
 
-1. build and package each module
+1. Build each buildpack (manually or use `./scripts/build.sh`)
 
-2. pack sample application:
+2. Package `pnpm-buildpack` (combination of four buildpacks)
+
+3. Create image for sample application:
     ```bash
-    pack build simple-app -p ./integration/simple-app -b gcr.io/paketo-buildpacks/node-engine -b ./pnpm/build/pnpm-buildpack.cnb -b ./pnpm-install/build/pnpm-install-buildpack.cnb -b ./pnpm-start/build/pnpm-start-buildpack.cnb
+    pack build pnpm-simple-app -p ./integration/simple-app -b ./build/pnpm-buildpack.cnb
     ```
 
+where `pnpm-simple-app` is the image name, `./integration/simple-app` is the location of the project, and
+`./build/pnpm-buildpack.cnb` is the output of the combined `pnpm-buildpack` from step 2. 
 
 ## TODO
 
 ### Cleanup
-- [ ] if, how, and where to add `pnpm build` step??
+
 - [ ] fix what happens in `pnpm-install` if `node_modules` already exists (_what happens if it exists but is invalid?_)
 - [ ] fix `build` vs `launch` dependencies
 - [ ] add latest `pnpm` dependency
 
 ### Testing
+
 - [ ] fix `pnpm-install` integration test(s)
 - [ ] add `pnpm-start` integration test(s)
 - [ ] add more full integration projects
 
 ### Features
+
 - [ ] cache `pnpm install` on layer (if the sha is the same)
+- [ ] generate sbom for dependencies / CVEs / auditability
 
 ### Building / Publishing
-- [ ] create primary script to bundle all three buildpacks
-- [ ] documents steps for building / packaging / publishing buildpack
+
+- [x] create primary script to bundle all three buildpacks
+- [x] documents steps for building / packaging / publishing buildpack
 - [ ] better utilize `jam` CLI tool to build/package each buildpack
 
-
 ## Questions
+
 - [ ] how are workspaces handled in existing buildpacks (npm/yarn)
 - [ ] how do buildpacks get published? which registry? (how does `cf create-buildpack` work in this context)
 - [ ] how do multiple buildpacks get combined into just a single one like (`nodejs_buildpack`)

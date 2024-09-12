@@ -14,8 +14,8 @@ function main() {
 
   mkdir -p "$BUILD_OUTPUT_DIR"
 
-  util::print::info "... Packaging buildpack into $BUILD_OUTPUT_DIR/pnpm-start.cnb ..."
-  pack buildpack package "$BUILD_OUTPUT_DIR/pnpm-start.cnb" --config "$PACKAGE_CONFIG" --format file
+  util::print::info "... Packaging buildpack into $BUILD_OUTPUT_DIR/pnpm-buildpack.cnb ..."
+  pack buildpack package "$BUILD_OUTPUT_DIR/pnpm-buildpack.cnb" --config "$PACKAGE_CONFIG" --format file
 
   if [ $? -eq 0 ]; then
     util::print::success "** Buildpack packaging completed **"

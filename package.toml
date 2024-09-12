@@ -1,0 +1,14 @@
+[buildpack]
+    uri = "."
+
+[[dependencies]]
+    uri = "paketo-buildpacks/node-engine"
+
+[[dependencies]]
+    uri = "./pnpm"
+
+[[dependencies]]
+    uri = "./pnpm-install"
+
+[[dependencies]]
+    uri = "./pnpm-start"

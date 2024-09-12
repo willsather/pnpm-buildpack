@@ -1,12 +1,17 @@
 api = "0.7"
 
 [buildpack]
-id = "willsather/pnpm-buildpack/pnpm-install"
-name = "PNPM Install Buildpack"
-version = "0.0.1"
+    homepage = "https://github.com/willsather/pnpm-buildpack"
+    id = "willsather/pnpm-install"
+    name = "PNPM Install"
+    version = "0.0.1"
 
-[[buildpack.licenses]]
-type = "Apache-2.0"
+    [[buildpack.licenses]]
+        type = "MIT"
+
+[metadata]
+    include-files = ["bin/build", "bin/detect", "bin/run", "buildpack.toml"]
+    pre-package = "./scripts/build.sh"
 
 [[stacks]]
-id = "*"
+    id = "*"
