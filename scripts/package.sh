@@ -1,9 +1,7 @@
 #!/bin/bash
 
-# directory locations
 readonly SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
-# import utils
 source "${SCRIPT_DIR}/utils/print.sh"
 
 BUILD_OUTPUT_DIR="./build"
@@ -20,8 +18,7 @@ function main() {
   if [ $? -eq 0 ]; then
     util::print::success "** Buildpack packaging completed **"
   else
-    util::print::failure "** Buildpack packaging failed **"
-    exit 1
+    util::print::error "** Buildpack packaging failed **"
   fi
 }
 

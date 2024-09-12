@@ -14,7 +14,6 @@ function main() {
     "${BUILD_SCRIPT}"
   else
     util::print::error "Error: Build script '${BUILD_SCRIPT}' does not exist or is not executable."
-    exit 1
   fi
 
   # Check if package.sh exists and is executable
@@ -22,7 +21,6 @@ function main() {
     "${PACKAGE_SCRIPT}"
   else
     util::print::error "Error: Package script '${PACKAGE_SCRIPT}' does not exist or is not executable."
-    exit 1
   fi
 }
 

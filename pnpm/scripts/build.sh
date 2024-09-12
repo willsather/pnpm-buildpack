@@ -3,12 +3,11 @@
 set -eu
 set -o pipefail
 
-# Directory locations
 readonly SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+readonly ROOT_DIR="$(cd "${SCRIPT_DIR}/../.." && pwd)"
 readonly BUILDPACK_DIR="$(cd "${SCRIPT_DIR}/.." && pwd)"
 
-# import utils
-source "${SCRIPT_DIR}/utils/print.sh"
+source "${ROOT_DIR}/scripts/utils/print.sh"
 
 function main() {
   util::print::title "** GO build **"

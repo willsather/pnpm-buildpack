@@ -3,9 +3,6 @@
 This repository is a monorepo of different modules needed to install necessary dependencies and run Node application
 that use `pnpm` as a package manager.
 
-> [!WARNING]  
-> This repository is in active development, there is no expectation this code is functioning or usable (yet). :)
-
 ## Modules
 
 This repository contains three different Cloud Native Buildpacks:
@@ -17,17 +14,30 @@ This repository contains three different Cloud Native Buildpacks:
 Which are can be built separately, but can be combined to fully build a Node application that utilizes the `pnpm`
 package manager.
 
-Roughly, `pnpm` provides the `pnpm` dependency as a global dependency on the image.  `pnpm-install` provides
-`node_modules` and downloads the necessary dependencies on the image. And lastly, `pnpm-start` takes the image that has
-`pnpm` and `node_modules` and runs the `start` command for the Node application.
+Roughly:
+
+1. `pnpm` provides the `pnpm` dependency as a global dependency on the image.
+
+2. `pnpm-install` provides `node_modules` and downloads the necessary dependencies on the image.
+
+3. `pnpm-start` takes the image that has `pnpm` and `node_modules` and runs the `start` command for the Node
+   application.
 
 ## Local Setup
 
 Current testing looks like:
 
-1. Build each buildpack (manually or use `./scripts/build.sh`)
+1. Build each buildpack using (_this can also be done manually within each buildpack's `./scripts/build.sh`_)
 
-2. Package `pnpm-buildpack` (combination of four buildpacks)
+   ```bash
+   ./scripts/build.sh
+   ```
+
+2. Package `pnpm-buildpack` (_composite buildpack using `pnpm`, `pnpm-install`, and `pnpm-start`_)
+
+   ```bash
+   ./scripts/package.sh
+   ```
 
 3. Create image for sample application:
     ```bash
@@ -35,7 +45,7 @@ Current testing looks like:
     ```
 
 where `pnpm-simple-app` is the image name, `./integration/simple-app` is the location of the project, and
-`./build/pnpm-buildpack.cnb` is the output of the combined `pnpm-buildpack` from step 2. 
+`./build/pnpm-buildpack.cnb` is the output of the combined `pnpm-buildpack` from step 2.
 
 ## TODO
 
@@ -60,10 +70,9 @@ where `pnpm-simple-app` is the image name, `./integration/simple-app` is the loc
 
 - [x] create primary script to bundle all three buildpacks
 - [x] documents steps for building / packaging / publishing buildpack
-- [ ] better utilize `jam` CLI tool to build/package each buildpack
 
 ## Questions
 
-- [ ] how are workspaces handled in existing buildpacks (npm/yarn)
-- [ ] how do buildpacks get published? which registry? (how does `cf create-buildpack` work in this context)
-- [ ] how do multiple buildpacks get combined into just a single one like (`nodejs_buildpack`)
+- [x] how are workspaces handled in existing buildpacks (npm/yarn)
+- [x] how do buildpacks get published? which registry? (how does `cf create-buildpack` work in this context)
+- [x] how do multiple buildpacks get combined into just a single one like (`nodejs_buildpack`)

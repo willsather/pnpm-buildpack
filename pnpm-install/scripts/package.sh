@@ -20,8 +20,7 @@ function main() {
   if [ $? -eq 0 ]; then
     util::print::success "** Buildpack packaging completed **"
   else
-    util::print::failure "** Buildpack packaging failed **"
-    exit 1
+    util::print::error "** Buildpack packaging failed **"
   fi
 }
 
