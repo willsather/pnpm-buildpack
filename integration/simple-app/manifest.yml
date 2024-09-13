@@ -3,8 +3,6 @@ applications:
   - name: pnpm-sample-app
     buildpacks:
       - pnpm-buildpack
-      - pnpm-install-buildpack
-      - pnpm-start-buildpack
     instances: 1
     memory: 512M
     disk_quota: 1G

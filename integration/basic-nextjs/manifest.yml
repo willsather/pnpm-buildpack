@@ -1,0 +1,8 @@
+---
+applications:
+  - name: pnpm-basic-nextjs
+    path: .next
+    instances: 1
+    memory: 512M
+    disk_quota: 1G
+    command: node standalone/server.js
