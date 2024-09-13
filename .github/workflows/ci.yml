@@ -21,7 +21,7 @@ jobs:
       - name: test
         working-directory: ./pnpm
         run: |
-          go test ./...  
+          go test -v -short ./...
 
   pnpm-install:
     runs-on: ubuntu-latest
@@ -38,7 +38,8 @@ jobs:
       - name: test
         working-directory: ./pnpm-install
         run: |
-          go test ./...
+          go test -v -short ./...
+
   pnpm-start:
     runs-on: ubuntu-latest
 
@@ -54,4 +55,4 @@ jobs:
       - name: test
         working-directory: ./pnpm-start
         run: |
-          go test ./...
+          go test -v -short ./...

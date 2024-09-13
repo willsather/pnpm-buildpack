@@ -74,6 +74,12 @@ func Test_BuildSuccessfully(t *testing.T) {
 	Expect(layer.Name).To(Equal("build-modules"))
 	Expect(layer.Path).To(Equal(filepath.Join(layersDirectory, "build-modules")))
 
+	// then node_modules should be added to class path
+	Expect(layer.LaunchEnv).To(Equal(packit.Environment{
+		"PATH.append": filepath.Join(layersDirectory, "build-modules", "node_modules", ".bin"),
+		"PATH.delim":  ":",
+	}))
+
 	// TODO: should assertions be made on `build` and `cache`?
 	Expect(layer.Launch).To(BeTrue())
 

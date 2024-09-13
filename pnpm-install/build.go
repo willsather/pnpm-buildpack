@@ -46,8 +46,8 @@ func Build(dependencyService DependencyService, logger scribe.Emitter) packit.Bu
 			return packit.BuildResult{}, err
 		}
 
-		// make new node_modules folder (TODO: test context.workingDir vs layer.Path)
-		err = os.Mkdir(filepath.Join(context.WorkingDir, "node_modules"), os.ModePerm)
+		// make new node_modules folder (if it doesn't exist)
+		err = os.MkdirAll(filepath.Join(context.WorkingDir, "node_modules"), os.ModePerm)
 		if err != nil {
 			return packit.BuildResult{}, err
 		}
@@ -69,6 +69,13 @@ func Build(dependencyService DependencyService, logger scribe.Emitter) packit.Bu
 		//if err != nil {
 		//	return packit.BuildResult{}, err
 		//}
+
+		// attach `node_modules/.bin` to layer path
+		nodeModulesBinPath := filepath.Join(layer.Path, "node_modules", ".bin")
+		layer.LaunchEnv.Append("PATH", nodeModulesBinPath, string(os.PathListSeparator))
+
+		// TODO: do we need to set `NODE_ENV` or anything else related here?
+		// If so, how do they differ in `build` vs `launch` layers (ie: `NODE_ENV=development` vs `NODE_ENV=production`)
 
 		logger.Detail("* Installed Dependencies")
 		logger.Break()

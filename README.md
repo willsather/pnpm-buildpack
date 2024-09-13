@@ -49,10 +49,11 @@ where `pnpm-simple-app` is the image name, `./integration/simple-app` is the loc
 
 ## TODO
 
-### Cleanup
+### Fix / Cleanup
 
-- [ ] fix what happens in `pnpm-install` if `node_modules` already exists (_what happens if it exists but is invalid?_)
+- [x] add `node_mdules/.bin` to path (how does this work with `pnpm`?)
 - [ ] fix `build` vs `launch` dependencies
+- [ ] fix what happens in `pnpm-install` if `node_modules` already exists (_what happens if it exists but is invalid?_)
 - [ ] add latest `pnpm` dependency
 
 ### Testing
@@ -63,7 +64,7 @@ where `pnpm-simple-app` is the image name, `./integration/simple-app` is the loc
 
 ### Features
 
-- [ ] cache `pnpm install` on layer (if the sha is the same)
+- [ ] cache `pnpm install` on layer (if the `sha` is the same)
 - [ ] generate sbom for dependencies / CVEs / auditability
 
 ### Building / Publishing

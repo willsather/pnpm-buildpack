@@ -3,7 +3,6 @@ package pnpmstart
 import (
 	"github.com/paketo-buildpacks/packit/v2"
 	"github.com/paketo-buildpacks/packit/v2/scribe"
-	"os"
 )
 
 func Build(logger scribe.Emitter) packit.BuildFunc {
@@ -65,7 +64,6 @@ func Build(logger scribe.Emitter) packit.BuildFunc {
 
 		logger.LaunchProcesses(processes)
 		logger.Detail("* PNPM Start Build returning Processes")
-		logger.Detail("* PATH:", os.Getenv("PATH"))
 
 		return packit.BuildResult{
 			Launch: packit.LaunchMetadata{
