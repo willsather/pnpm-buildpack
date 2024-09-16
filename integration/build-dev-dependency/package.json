@@ -1,0 +1,23 @@
+{
+  "name": "@integration/build-dev-dependency",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js",
+    "build": "echo 'Build script executed'"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "express": "^4.19.2"
+  },
+  "devDependencies": {
+    "is-even": "^1.0.0"
+  },
+  "packageManager": "pnpm@8.15.4",
+  "engines": {
+    "node": ">=20"
+  }
+}

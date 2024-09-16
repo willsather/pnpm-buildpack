@@ -10,13 +10,13 @@ readonly BUILDPACK_DIR="$(cd "${SCRIPT_DIR}/.." && pwd)"
 source "${ROOT_DIR}/scripts/utils/print.sh"
 
 function main() {
-  util::print::title "** GO build **"
+  util::print::title "** Building 'pnpm-start.cnb' **"
 
   mkdir -p "${BUILDPACK_DIR}/bin"
 
   build
 
-  util::print::success "** GO build completed **"
+  util::print::success "** Successfully Built 'pnpm-start.cnb' **"
 }
 
 function build() {

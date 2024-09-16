@@ -1,0 +1,8 @@
+---
+applications:
+  - name: pnpm-sample-app
+    buildpacks:
+      - pnpm-buildpack
+    instances: 1
+    memory: 512M
+    disk_quota: 1G

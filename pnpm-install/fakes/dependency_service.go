@@ -18,7 +18,7 @@ var _ pnpminstall.DependencyService = &DependencyServiceMock{}
 //
 //		// make and configure a mocked pnpminstall.DependencyService
 //		mockedDependencyService := &DependencyServiceMock{
-//			InstallFunc: func(path string) error {
+//			InstallFunc: func(path string, launch bool) error {
 //				panic("mock out the Install method")
 //			},
 //		}
@@ -29,7 +29,7 @@ var _ pnpminstall.DependencyService = &DependencyServiceMock{}
 //	}
 type DependencyServiceMock struct {
 	// InstallFunc mocks the Install method.
-	InstallFunc func(path string) error
+	InstallFunc func(path string, launch bool) error
 
 	// calls tracks calls to the methods.
 	calls struct {
@@ -37,25 +37,29 @@ type DependencyServiceMock struct {
 		Install []struct {
 			// Path is the path argument value.
 			Path string
+			// Launch is the launch argument value.
+			Launch bool
 		}
 	}
 	lockInstall sync.RWMutex
 }
 
 // Install calls InstallFunc.
-func (mock *DependencyServiceMock) Install(path string) error {
+func (mock *DependencyServiceMock) Install(path string, launch bool) error {
 	if mock.InstallFunc == nil {
 		panic("DependencyServiceMock.InstallFunc: method is nil but DependencyService.Install was just called")
 	}
 	callInfo := struct {
-		Path string
+		Path   string
+		Launch bool
 	}{
-		Path: path,
+		Path:   path,
+		Launch: launch,
 	}
 	mock.lockInstall.Lock()
 	mock.calls.Install = append(mock.calls.Install, callInfo)
 	mock.lockInstall.Unlock()
-	return mock.InstallFunc(path)
+	return mock.InstallFunc(path, launch)
 }
 
 // InstallCalls gets all the calls that were made to Install.
@@ -63,10 +67,12 @@ func (mock *DependencyServiceMock) Install(path string) error {
 //
 //	len(mockedDependencyService.InstallCalls())
 func (mock *DependencyServiceMock) InstallCalls() []struct {
-	Path string
+	Path   string
+	Launch bool
 } {
 	var calls []struct {
-		Path string
+		Path   string
+		Launch bool
 	}
 	mock.lockInstall.RLock()
 	calls = mock.calls.Install

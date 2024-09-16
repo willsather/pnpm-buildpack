@@ -11,8 +11,14 @@ import (
 
 type DependencyService struct{}
 
-func (s *DependencyService) Install(path string) error {
-	installCmd := exec.Command("pnpm", "install", "--frozen-lockfile")
+func (s *DependencyService) Install(path string, launch bool) error {
+	args := []string{"install", "--frozen-lockfile"}
+
+	if !launch {
+		args = append(args, "--production", "false")
+	}
+
+	installCmd := exec.Command("pnpm", args...)
 	installCmd.Dir = path
 	installCmd.Stdout = os.Stdout
 	installCmd.Stderr = os.Stderr
