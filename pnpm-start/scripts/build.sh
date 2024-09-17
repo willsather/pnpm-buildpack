@@ -7,7 +7,7 @@ readonly SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 readonly ROOT_DIR="$(cd "${SCRIPT_DIR}/../.." && pwd)"
 readonly BUILDPACK_DIR="$(cd "${SCRIPT_DIR}/.." && pwd)"
 
-source "${ROOT_DIR}/scripts/utils/print.sh"
+source "${SCRIPT_DIR}/utils/print.sh"
 
 function main() {
   util::print::title "** Building 'pnpm-start.cnb' **"

@@ -48,14 +48,18 @@ func Test_SimpleSampleApplicationPnpmInstall(t *testing.T) {
 	_, err = toml.NewDecoder(file).Decode(&buildpackInfo)
 	Expect(err).NotTo(HaveOccurred())
 
-	// go get all necessary buildpacks
+	// create occam store to pull all necessary buildpacks
 	buildpackStore := occam.NewBuildpackStore()
 
 	nodeURI, err := buildpackStore.Get.Execute("github.com/paketo-buildpacks/node-engine")
 	Expect(err).ToNot(HaveOccurred())
 
-	pnpmURI, err := buildpackStore.Get.WithVersion("0.0.1").Execute("../../pnpm")
+	// get `pnpm` buildpack path
+	pnpmDirectory, err := filepath.Abs("./../../pnpm")
+	Expect(err).ToNot(HaveOccurred())
 
+	// get `pnpm` buildpack
+	pnpmURI, err := buildpackStore.Get.WithVersion("0.0.1").Execute(pnpmDirectory)
 	Expect(err).ToNot(HaveOccurred())
 
 	// source the sample project
@@ -67,9 +71,6 @@ func Test_SimpleSampleApplicationPnpmInstall(t *testing.T) {
 		WithBuildpacks(
 			nodeURI,
 			pnpmURI,
-			// TODO: are these needed for pnpm?
-			//buildpackURI,
-			//buildPlanURI,
 		).
 		WithPullPolicy("always").
 		Execute(name, source)
@@ -88,7 +89,7 @@ func Test_SimpleSampleApplicationPnpmInstall(t *testing.T) {
 		cLogs, err := docker.Container.Logs.Execute(container.ID)
 		Expect(err).NotTo(HaveOccurred())
 		return cLogs.String()
-	}).Should(ContainSubstring("leftpad"))
+	}).Should(ContainSubstring("is-even"))
 
 	// cleanup
 	Expect(docker.Container.Remove.Execute(container.ID)).To(Succeed())

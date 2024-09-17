@@ -1,0 +1,5 @@
+[[requires]]
+  name = "pnpm"
+
+  [requires.metadata]
+    launch = true

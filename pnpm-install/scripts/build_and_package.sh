@@ -8,6 +8,8 @@ readonly SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 readonly BUILD_SCRIPT="${SCRIPT_DIR}/build.sh"
 readonly PACKAGE_SCRIPT="${SCRIPT_DIR}/package.sh"
 
+source "${SCRIPT_DIR}/utils/print.sh"
+
 function main() {
   # Check if build.sh exists and is executable
   if [[ -x "${BUILD_SCRIPT}" ]]; then
